@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\Usuario;
 
 class UsuarioController extends Controller
@@ -36,12 +37,23 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        $usuario = new Usuario();
-        $usuario->nombre = $request->nombre;
-        $usuario->apellido = $request->apellido;
-        $usuario->dni = $request->dni;
-
-        $usuario->save(); 
+        $request->validate([
+            'nombre' => 'required|string',
+            'apellido' => 'required|string',
+            'dni' => 'required|numeric|digits_between:8,8'
+        ]);
+        try{
+            $usuario = new Usuario();
+            $usuario->nombre = $request->nombre;
+            $usuario->apellido = $request->apellido;
+            $usuario->dni = $request->dni;
+    
+            $usuario->save(); 
+            return \response($usuario);
+        }
+        catch(\Exception $e){
+                return json_encode($e);
+            }
     }
 
     /**
@@ -75,14 +87,25 @@ class UsuarioController extends Controller
      */
     public function update(Request $request)
     {
-        $usuario = Usuario::findOrFail($request->id);
-        $usuario->nombre = $request->nombre;
-        $usuario->apellido = $request->apellido;
-        $usuario->dni = $request->dni;
 
-        $usuario->save();
+        $request->validate([
+            'nombre' => 'required|string',
+            'apellido' => 'required|string',
+            'dni' => 'required|numeric|digits_between:8,8'
+        ]);
+        
+        try{
+            $usuario = Usuario::findOrFail($request->id);
+            $usuario->nombre = $request->nombre;
+            $usuario->apellido = $request->apellido;
+            $usuario->dni = $request->dni;
 
-        return $usuario;
+            $usuario->save(); 
+            return \response($usuario);
+        }
+            catch(\Exception $e){
+            return json_encode($e);
+        }
     }
 
     /**
